@@ -255,7 +255,7 @@ class EightQueens:
             if algorithm == "Backtracking":
                 self.backtracking_steps = 0
                 self.update_step_counter(0)
-                self.attempts_value.config(text="0")
+                self.attempts_value.config(text="0") 
             else:  # Las Vegas
                 self.constrained_attempts = 0
                 self.step_counter_value.config(text="0")
@@ -414,6 +414,8 @@ class EightQueens:
         start_time = time.time()
         self.backtracking_solution = [0] * self.BOARD_SIZE
         self.backtracking_steps = 0
+
+        self.update_step_counter(1)
         
         solved = self.solve_backtracking(0)
         duration = int((time.time() - start_time) * 1000)
