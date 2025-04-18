@@ -144,17 +144,7 @@ class EightQueens:
         self.stats_frame = ttk.LabelFrame(self.right_panel, text="Statistics", padding=10)
         self.stats_frame.pack(fill=tk.X, pady=10)
         
-        # Step counter
-        self.step_counter_frame = ttk.Frame(self.stats_frame)
-        self.step_counter_frame.pack(fill=tk.X, pady=5)
-        
-        self.step_counter_label = ttk.Label(self.step_counter_frame, text="Steps:", anchor=tk.W)
-        self.step_counter_label.pack(side=tk.LEFT)
-        
-        self.step_counter_value = ttk.Label(self.step_counter_frame, text="0", style="Counter.TLabel", anchor=tk.E)
-        self.step_counter_value.pack(side=tk.RIGHT)
-        
-        # Attempts counter (for Las Vegas)
+        # Attempts counter (for both algorithms)
         self.attempts_frame = ttk.Frame(self.stats_frame)
         self.attempts_frame.pack(fill=tk.X, pady=5)
         
@@ -254,11 +244,9 @@ class EightQueens:
             # Reset counters
             if algorithm == "Backtracking":
                 self.backtracking_steps = 0
-                self.update_step_counter(0)
-                self.attempts_value.config(text="0") 
+                self.update_attempts_counter(0)
             else:  # Las Vegas
                 self.constrained_attempts = 0
-                self.step_counter_value.config(text="0")
                 self.update_attempts_counter(0)
             
             # Run solver in separate thread
@@ -305,7 +293,6 @@ class EightQueens:
             self.backtracking_steps = 0
             self.constrained_attempts = 0
             self.status_label.config(text="Ready")
-            self.update_step_counter(0)
             self.update_attempts_counter(0)
             self.clear_queens()
             self.previous_solution = []
@@ -325,10 +312,6 @@ class EightQueens:
     def update_status(self, text):
         """Thread-safe status update"""
         self.update_queue.put(lambda text=text: self.status_label.config(text=text))
-    
-    def update_step_counter(self, steps):
-        """Thread-safe step counter update"""
-        self.update_queue.put(lambda s=steps: self.step_counter_value.config(text=str(s)))
     
     def update_attempts_counter(self, attempts):
         """Thread-safe attempts counter update"""
@@ -414,14 +397,15 @@ class EightQueens:
         start_time = time.time()
         self.backtracking_solution = [0] * self.BOARD_SIZE
         self.backtracking_steps = 0
-
-        self.update_step_counter(1)
+        
+        # Start with 0 attempts and let the recursive method update it
+        self.update_attempts_counter(0)
         
         solved = self.solve_backtracking(0)
         duration = int((time.time() - start_time) * 1000)
         
         if solved:
-            status_text = f"Backtracking: {self.backtracking_steps} steps in {duration} ms"
+            status_text = f"Backtracking: Solution found in {duration} ms ({self.backtracking_steps} positions tried)"
             self.update_status(status_text)
             self.update_queen_positions(self.backtracking_solution, "Backtracking")
         else:
@@ -430,10 +414,16 @@ class EightQueens:
         self.end_processing()
     
     def solve_backtracking(self, col):
+        # Each time we try to place a queen, increment the steps counter
         self.backtracking_steps += 1
-        self.update_step_counter(self.backtracking_steps)
+        
+        # Update the UI with the number of positions tried so far
+        if self.backtracking_steps % 10 == 0:  # Update every 10 steps to avoid overwhelming the UI
+            self.update_attempts_counter(self.backtracking_steps)
         
         if col >= self.BOARD_SIZE:
+            # Make sure the final count is displayed
+            self.update_attempts_counter(self.backtracking_steps)
             return True
 
         for row in range(self.BOARD_SIZE):
@@ -484,12 +474,8 @@ class EightQueens:
     
     def constrained_las_vegas(self):
         queens = []  # Start with empty list to only show queens as they're placed
-        steps = 0
         
         for col in range(self.BOARD_SIZE):
-            steps += 1
-            self.update_step_counter(steps)
-            
             # Create a temporary list with the correct length for safe_rows check
             temp_queens = queens + [0] * (self.BOARD_SIZE - len(queens))
             safe_rows = self.get_safe_rows(col, temp_queens)
