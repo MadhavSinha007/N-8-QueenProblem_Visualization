@@ -7,7 +7,7 @@ A Python-based GUI application that visually demonstrates two different algorith
 
 The application features an interactive chessboard with real-time visualization of the algorithms' progress, adjustable animation speed, and performance statistics.
 
-**Las Vegas Algorithm**
+**Backtracking Algorithm**
 ![8-Queens **Backtracking Algorithm**](./assets/Screenshot%20from%202025-04-22%2018-59-02.png)
 
 **Las Vegas Algorithm**
