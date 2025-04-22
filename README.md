@@ -7,7 +7,8 @@ A Python-based GUI application that visually demonstrates two different algorith
 
 The application features an interactive chessboard with real-time visualization of the algorithms' progress, adjustable animation speed, and performance statistics.
 
-![8-Queens Demo](https://github.com/username/N-8-QueenProblem_Visualization/raw/main/demo.gif)
+![8-Queens **Backtracking Algorithm**](./assets/Screenshot%20from%202025-04-22%2018-59-02.png)
+![8-Queens **Las Vegas Algorithm**](./assets/Screenshot%20from%202025-04-22%2018-59-14.png)
 
 ## Table of Contents
 - [Installation](#installation)
